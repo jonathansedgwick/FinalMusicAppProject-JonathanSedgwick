@@ -1,4 +1,4 @@
-package com.jonathansedgwick.finalproject_musicapp
+package com.jonathansedgwick.finalproject_musicapp.Retrofit
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

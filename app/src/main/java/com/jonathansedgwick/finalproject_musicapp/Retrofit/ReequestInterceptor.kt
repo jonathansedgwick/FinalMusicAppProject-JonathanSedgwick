@@ -1,4 +1,4 @@
-package com.jonathansedgwick.finalproject_musicapp
+package com.jonathansedgwick.finalproject_musicapp.Retrofit
 
 import okhttp3.Interceptor
 import okhttp3.Response

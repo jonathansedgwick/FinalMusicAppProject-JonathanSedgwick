@@ -1,7 +1,6 @@
 package com.jonathansedgwick.finalproject_musicapp
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.jonathansedgwick.finalproject_musicapp.DataStore.DataStoreManager
+import com.jonathansedgwick.finalproject_musicapp.Retrofit.User
+import com.jonathansedgwick.finalproject_musicapp.Retrofit.UserService
 import kotlinx.coroutines.*
 import org.json.JSONObject
-import org.json.JSONStringer
 import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.concurrent.Executors
+import kotlin.random.Random
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,24 +32,23 @@ class MainActivity : AppCompatActivity() {
     var signupEmail: String = ""
     var signupPassword: String = ""
 
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+
 
         loginButton = findViewById(R.id.login_button)
         signupButton = findViewById(R.id.signup_button)
 
         loginButton.setOnClickListener {
             handleLoginDialogue()
-            MainScope().launch {
-                var result = ""
-                withContext(Dispatchers.IO) {
-                    result = UserService().successfulUsersResponse()
-                    val user: User = User("555","Megan","Megan123")
-                    UserService().addUser(user)
-                }
-                textText.text = result
-            }
+
         }
 //
         signupButton.setOnClickListener {
@@ -61,23 +59,8 @@ class MainActivity : AppCompatActivity() {
         textText = findViewById(R.id.testText)
 
 
-        MainScope().launch {
-            var result = ""
-            withContext(Dispatchers.IO) {
-               result = UserService().successfulUsersResponse()
-            }
-            textText.text = result
-        }
-
-
-
-
 
     }
-
-
-
-
 
 
     private fun handleLoginDialogue() {
@@ -131,9 +114,14 @@ class MainActivity : AppCompatActivity() {
                 signupEmail = emailEdit.text.toString()
                 signupPassword = passwordEdit.text.toString()
 
-                createId()
 
 
+                MainScope().launch {
+                    withContext(Dispatchers.IO) {
+                        val user: User = User(createId(), signupEmail, signupPassword)
+                        UserService().addUser(user)
+                    }
+                }
 
 
                 viewGroup.removeAllViews()
@@ -148,28 +136,29 @@ class MainActivity : AppCompatActivity() {
 //
     }
 
-    private fun createId(): String {
+    private suspend fun createId(): String {
 
-        var id = ""
+        var data = ""
+        data = UserService().successfulUsersResponse()
 
-        MainScope().launch {
-            var result = ""
-            withContext(Dispatchers.IO) {
-                result = UserService().successfulUsersResponse()
+       Log.d("Server Data", data)
+
+        val jsonResult = JSONObject(data)
+        val jsonArray = jsonResult.getJSONArray("User")
+        var potentialId = 0
+        var validId = false
+        while (validId == false) {
+
+            potentialId = Random.nextInt(10000,99999)
+
+            for (i in 0 until jsonArray.length()) {
+                val userArray = jsonArray.getJSONArray(i)
+                validId = potentialId.toString() != userArray.getString(1)
             }
-
-            val jsonResult = JSONObject(result)
-
-            val jsonArray = jsonResult.getJSONArray("")
-
-
-
         }
+        return potentialId.toString()
 
 
-
-
-return id
     }
 
 
