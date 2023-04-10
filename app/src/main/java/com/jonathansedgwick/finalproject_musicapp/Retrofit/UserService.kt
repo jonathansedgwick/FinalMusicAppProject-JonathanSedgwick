@@ -1,36 +1,18 @@
 package com.jonathansedgwick.finalproject_musicapp.Retrofit
 
-import android.util.Log
-import com.fasterxml.jackson.core.JsonParseException
 
-class UserService {
-    private val retrofit = RetrofitClient.getClient()
-    private val userApi = retrofit.create(UserApi::class.java)
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
 
-    fun successfulUsersResponse(): String {
-        try {
-            val usersResponse = userApi.getUsers()
-                .execute()
-            val successful = usersResponse.isSuccessful
-            val httpStatusCode = usersResponse.code()
-            val httpStatusMessage = usersResponse.message()
+interface UserService {
 
-            val body: List<User>? = usersResponse.body()
-            return body.toString()
-        } catch (e: JsonParseException) {
-            Log.e("Error", "unrecognized token-getusers")
-            return "Error with token"
-        }
-        return "Couldn't connect"
-    }
+    @POST("/signup")
+    fun signupUser(@Body user: UserModel) : Call<UserModel>
 
-    fun addUser(user: User) {
-        try {
-            val add = userApi.addUser(user).execute()
-        } catch (e: JsonParseException) {
-            Log.e("Error", "unrecognized token-adduser")
-        }
+    @POST("/login")
+    fun loginUser(@Body user: UserModel) : Call<Any?>
 
-    }
+
 
 }

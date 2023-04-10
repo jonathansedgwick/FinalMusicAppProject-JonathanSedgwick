@@ -1,20 +1,31 @@
 package com.jonathansedgwick.finalproject_musicapp
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.JsonReader
+import android.util.JsonWriter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.jonathansedgwick.finalproject_musicapp.DataStore.DataStoreManager
-import com.jonathansedgwick.finalproject_musicapp.Retrofit.User
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.jonathansedgwick.finalproject_musicapp.Retrofit.ServiceBuilder
+import com.jonathansedgwick.finalproject_musicapp.Retrofit.TokenModel
+import com.jonathansedgwick.finalproject_musicapp.Retrofit.UserModel
 import com.jonathansedgwick.finalproject_musicapp.Retrofit.UserService
 import kotlinx.coroutines.*
-import org.json.JSONObject
-import java.io.*
-import kotlin.random.Random
+import retrofit2.Response
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,13 +36,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var view: View
     lateinit var relativeLayout: RelativeLayout
     lateinit var scrollText: TextView
-    lateinit var textText: TextView
     var loginEmail: String = ""
     var loginPassword: String = ""
     var signupName: String = ""
     var signupEmail: String = ""
     var signupPassword: String = ""
-
 
 
 
@@ -48,7 +57,6 @@ class MainActivity : AppCompatActivity() {
 
         loginButton.setOnClickListener {
             handleLoginDialogue()
-
         }
 //
         signupButton.setOnClickListener {
@@ -56,7 +64,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        textText = findViewById(R.id.testText)
 
 
 
@@ -64,7 +71,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun handleLoginDialogue() {
-        print("Inflater")
         val inflater: LayoutInflater =
             this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val viewGroup: ViewGroup = findViewById(R.id.login_linear_layout)
@@ -78,10 +84,41 @@ class MainActivity : AppCompatActivity() {
         var loginBtn: Button = view.findViewById(R.id.login)
         var emailEdit: EditText = view.findViewById(R.id.loginEmailEdit)
         var passwordEdit: EditText = view.findViewById(R.id.loginPasswordEdit)
+        val backButton: Button = view.findViewById(R.id.login_back_button)
 
         loginBtn.setOnClickListener {
-            loginEmail = emailEdit.text.toString()
-            loginPassword = passwordEdit.text.toString()
+
+            if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
+
+                MainScope().launch {
+                    withContext(Dispatchers.IO) {
+                        val apiService = ServiceBuilder.buildService(UserService::class.java)
+                        val loginUser =
+                            UserModel(emailEdit.text.toString(), passwordEdit.text.toString())
+                        val call = apiService.loginUser(loginUser)
+                        val result: Response<Any?> = call.execute()
+                        val data = result.body()
+                        val gson = Gson()
+                        val jsonStringData = gson.toJson(data)
+                        Log.d("String", jsonStringData)
+                        val token = gson.fromJson(jsonStringData, TokenModel::class.java)
+                        val loginToken = token.token
+                        Log.d("Key", loginToken)
+                        if (result.code() == 200) {
+                            nextActivity(loginToken)
+                        } else {
+                            Log.d("Response", "Wrong username or password")
+                        }
+
+                    }
+                }
+
+
+            }
+
+        }
+
+        backButton.setOnClickListener {
             viewGroup.removeAllViews()
             signupButton.visibility = View.VISIBLE
             loginButton.visibility = View.VISIBLE
@@ -103,66 +140,63 @@ class MainActivity : AppCompatActivity() {
         viewGroup.addView(view)
 
 
-        var signupBtn: Button = view.findViewById(R.id.signup)
-        var emailEdit: EditText = view.findViewById(R.id.signupEmailEdit)
-        var passwordEdit: EditText = view.findViewById(R.id.signupPasswordEdit)
+        val signupBtn: Button = view.findViewById(R.id.signup)
+        val emailEdit: EditText = view.findViewById(R.id.signupEmailEdit)
+        val passwordEdit: EditText = view.findViewById(R.id.signupPasswordEdit)
+        val backButton: Button = view.findViewById(R.id.signup_back_button)
 
         signupBtn.setOnClickListener {
 
 
             if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
-                signupEmail = emailEdit.text.toString()
-                signupPassword = passwordEdit.text.toString()
-
-
 
                 MainScope().launch {
                     withContext(Dispatchers.IO) {
-                        val user: User = User(createId(), signupEmail, signupPassword)
-                        UserService().addUser(user)
+                        val apiService = ServiceBuilder.buildService(UserService::class.java)
+                        val newUser =
+                            UserModel(emailEdit.text.toString(), passwordEdit.text.toString())
+                        val call = apiService.signupUser(newUser)
+                        val result: Response<UserModel> = call.execute()
+                        if (result.code() == 201) {
+                            nextActivity()
+                        } else {
+                            Log.d("Response", "User not added")
+                        }
+
+                        }
                     }
+
+
                 }
-
-
-                viewGroup.removeAllViews()
-                signupButton.visibility = View.VISIBLE
-                loginButton.visibility = View.VISIBLE
 
             }
 
 
+
+        backButton.setOnClickListener {
+            viewGroup.removeAllViews()
+            signupButton.visibility = View.VISIBLE
+            loginButton.visibility = View.VISIBLE
         }
 
 //
-    }
-
-    private suspend fun createId(): String {
-
-        var data = ""
-        data = UserService().successfulUsersResponse()
-
-       Log.d("Server Data", data)
-
-        val jsonResult = JSONObject(data)
-        val jsonArray = jsonResult.getJSONArray("User")
-        var potentialId = 0
-        var validId = false
-        while (validId == false) {
-
-            potentialId = Random.nextInt(10000,99999)
-
-            for (i in 0 until jsonArray.length()) {
-                val userArray = jsonArray.getJSONArray(i)
-                validId = potentialId.toString() != userArray.getString(1)
-            }
         }
-        return potentialId.toString()
 
 
+
+    private fun nextActivity(token: String) {
+        val intent = Intent(this@MainActivity, HomePage::class.java)
+        intent.putExtra("Token", token)
+        startActivity(intent)
     }
 
+    private fun nextActivity() {
+        val intent = Intent(this@MainActivity, HomePage::class.java)
+        startActivity(intent)
+    }
 
 
 
 }
+
 
