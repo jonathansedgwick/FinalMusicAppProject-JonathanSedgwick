@@ -3,6 +3,7 @@
     android:layout_width="350dp"
     android:layout_height="350dp"
     android:backgroundTint="#CCCBCB"
+    android:layout_gravity="center_horizontal"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="8dp"
     >
@@ -10,13 +11,14 @@
 
     <RelativeLayout
         android:layout_width="350dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
         <ImageView
             android:id="@+id/music_picture"
             android:layout_width="350dp"
             android:layout_height="350dp"
-            android:src="@drawable/empty_card_image"/>
+            android:src="@drawable/empty_card_image" />
 
         <TextView
             android:id="@+id/name_text"
