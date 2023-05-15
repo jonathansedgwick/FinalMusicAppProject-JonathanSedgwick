@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
 //
         signupButton.setOnClickListener {
+            nextActivity()
             handleSignUpDialogue()
         }
 
@@ -88,33 +89,43 @@ class MainActivity : AppCompatActivity() {
 
         loginBtn.setOnClickListener {
 
-            if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
 
-                MainScope().launch {
-                    withContext(Dispatchers.IO) {
-                        val apiService = ServiceBuilder.buildService(UserService::class.java)
-                        val loginUser =
-                            UserModel(emailEdit.text.toString(), passwordEdit.text.toString())
-                        val call = apiService.loginUser(loginUser)
-                        val result: Response<Any?> = call.execute()
-                        val data = result.body()
-                        val gson = Gson()
-                        val jsonStringData = gson.toJson(data)
-                        Log.d("String", jsonStringData)
-                        val token = gson.fromJson(jsonStringData, TokenModel::class.java)
-                        val loginToken = token.token
-                        Log.d("Key", loginToken)
-                        if (result.code() == 200) {
-                            nextActivity(loginToken)
-                        } else {
-                            Log.d("Response", "Wrong username or password")
+                if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
+
+                    MainScope().launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                val apiService =
+                                    ServiceBuilder.buildService(UserService::class.java)
+                                val loginUser =
+                                    UserModel(
+                                        emailEdit.text.toString(),
+                                        passwordEdit.text.toString()
+                                    )
+                                val call = apiService.loginUser(loginUser)
+                                val result: Response<Any?> = call.execute()
+                                val data = result.body()
+                                val gson = Gson()
+                                val jsonStringData = gson.toJson(data)
+                                Log.d("String", jsonStringData)
+                                val token = gson.fromJson(jsonStringData, TokenModel::class.java)
+                                val loginToken = token.token
+                                Log.d("Key", loginToken)
+                                if (result.code() == 200) {
+                                    nextActivity(loginToken)
+                                } else {
+                                    Log.d("Response", "Wrong username or password")
+                                }
+
+                            }catch (e: java.lang.NullPointerException) {
+                                Log.d("Response", "Crash")
+                            }
                         }
-
                     }
+
+
                 }
 
-
-            }
 
         }
 
@@ -148,28 +159,36 @@ class MainActivity : AppCompatActivity() {
         signupBtn.setOnClickListener {
 
 
-            if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
+                if (emailEdit.text.isNotEmpty() && passwordEdit.text.isNotEmpty()) {
 
-                MainScope().launch {
-                    withContext(Dispatchers.IO) {
-                        val apiService = ServiceBuilder.buildService(UserService::class.java)
-                        val newUser =
-                            UserModel(emailEdit.text.toString(), passwordEdit.text.toString())
-                        val call = apiService.signupUser(newUser)
-                        val result: Response<UserModel> = call.execute()
-                        if (result.code() == 201) {
-                            nextActivity()
-                        } else {
-                            Log.d("Response", "User not added")
-                        }
-
+                    MainScope().launch {
+                        withContext(Dispatchers.IO) {
+                            try {
+                                val apiService =
+                                    ServiceBuilder.buildService(UserService::class.java)
+                                val newUser =
+                                    UserModel(
+                                        emailEdit.text.toString(),
+                                        passwordEdit.text.toString()
+                                    )
+                                val call = apiService.signupUser(newUser)
+                                val result: Response<UserModel> = call.execute()
+                                if (result.code() == 201) {
+                                    nextActivity()
+                                } else {
+                                    Log.d("Response", "User not added")
+                                }
+                            } catch(e: java.lang.NullPointerException) {
+                                Log.d("Response", "Crash")
+                            }
                         }
                     }
 
 
                 }
 
-            }
+
+        }
 
 
 

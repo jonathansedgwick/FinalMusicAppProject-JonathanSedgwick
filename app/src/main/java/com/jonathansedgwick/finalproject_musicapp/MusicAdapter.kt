@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 
-class MusicAdapter(var context: Context, var musicList: ArrayList<MusicModel>):
+class MusicAdapter(var context: Context?, var musicList: ArrayList<MusicModel>):
     RecyclerView.Adapter<MusicAdapter.MusicCardViewHolder>() {
 
 

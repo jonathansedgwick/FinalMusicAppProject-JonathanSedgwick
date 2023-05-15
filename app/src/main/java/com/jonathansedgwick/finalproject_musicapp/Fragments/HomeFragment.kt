@@ -1,7 +1,11 @@
 package com.jonathansedgwick.finalproject_musicapp.Fragments
 
+import android.os.Bundle
+import android.provider.SyncStateContract
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathansedgwick.finalproject_musicapp.MusicAdapter
 import com.jonathansedgwick.finalproject_musicapp.MusicModel
@@ -25,7 +29,16 @@ class HomeFragment : Fragment(R.layout.home_fragment_activity) {
 //
 //    myAdapter = MusicAdapter(applicationContext, myMusicList)
 //    myRecyclerView.adapter = myAdapter
+override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
+    val musicList= setUpData()
+
+    val recyclerView:RecyclerView=view.findViewById(R.id.music_card_rv)
+    recyclerView.layoutManager = LinearLayoutManager(context)
+    var itemAdapter = MusicAdapter(context, musicList)
+    recyclerView.adapter = itemAdapter
+}
 
     private fun setUpData(): ArrayList<MusicModel> {
         var musicList = ArrayList<MusicModel>()

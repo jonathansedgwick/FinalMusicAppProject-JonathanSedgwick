@@ -48,8 +48,7 @@ class HomePage : AppCompatActivity() {
 
         }
 
-        tokenText = findViewById(R.id.token_text)
-        tokenText.text = loginToken
+
 
 
 
