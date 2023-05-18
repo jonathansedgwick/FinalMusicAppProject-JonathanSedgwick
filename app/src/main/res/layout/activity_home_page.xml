@@ -11,10 +11,12 @@
         android:name="com.jonathansedgwick.finalproject_musicapp.Fragments.HomeFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteY="675dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        />
+
+        tools:layout="@layout/home_fragment_activity" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
@@ -22,7 +24,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/home_bar_menu">
+        app:menu="@menu/home_bar_menu"
+        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/white"
+        android:id="@+id/bottom_bar">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 

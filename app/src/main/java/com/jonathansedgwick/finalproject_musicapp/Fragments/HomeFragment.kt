@@ -3,7 +3,9 @@ package com.jonathansedgwick.finalproject_musicapp.Fragments
 import android.os.Bundle
 import android.provider.SyncStateContract
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +40,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     recyclerView.layoutManager = LinearLayoutManager(context)
     var itemAdapter = MusicAdapter(context, musicList)
     recyclerView.adapter = itemAdapter
+
 }
 
     private fun setUpData(): ArrayList<MusicModel> {

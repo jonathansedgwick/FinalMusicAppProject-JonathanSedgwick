@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         }
 //
         signupButton.setOnClickListener {
-            nextActivity()
             handleSignUpDialogue()
         }
 
