@@ -1,13 +1,16 @@
 package com.jonathansedgwick.finalproject_musicapp
 
 import android.content.Context
+import android.media.MediaPlayer
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 
 
 class MusicAdapter(var context: Context?, var musicList: ArrayList<MusicModel>):
@@ -35,12 +38,16 @@ class MusicAdapter(var context: Context?, var musicList: ArrayList<MusicModel>):
         holder.lengthText.text = myMusicCard.musicLength
         holder.nameText.text = myMusicCard.musicName
 
-        holder.musicImage.setOnClickListener {
-            Toast.makeText(context, "Music", Toast.LENGTH_SHORT).show()
-        }
+
+
     }
 
     override fun getItemCount(): Int {
         return musicList.size
     }
+
+
+
+
+
 }
